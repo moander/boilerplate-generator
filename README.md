@@ -12,15 +12,20 @@ pnpm i && pnmp make --singular=fooBar --plural=fooBars --dry-run
 ### Basic filtering
 
 ```sh
-pnpm i && pnpm make -s fooBar -f 'vue|ts' --dry
+pnpm i && pnpm make -p fooBars -f 'vue|ts' --dry
 ```
 
 ### Regular expressions
 
 ```sh
-pnpm i && pnpm make -s fooBar -x 'vue|ts' --dry
+pnpm i && pnpm make -p fooBars -x 'vue|ts' --dry
 ```
 
+### Batch update multiple targets in one go
+
+```sh
+pn i && pn make -p fooBars -p fooBarItems --dry
+```
 
 ## Maintain boilerplate
 

@@ -13,13 +13,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url)) // hack to get __
 const { kebabCase, startCase, sortBy, uniqBy, escapeRegExp } = lodash
 
 function main(argv: Record<string, any>) {
-  console.log('argv', argv)
+  argv.v && console.log('argv', argv)
 
-  const targetSingular = String(argv.s || argv.singular || '') // required (fooBar)
+  const targetSingular = argv.s ?? argv.singular ?? '' // required without --plural (fooBar)
+  if (typeof targetSingular !== 'string') throw new Error('fail')
+
+  const targetPlural = argv.p ?? argv.plural ?? '' // required without --singular (fooBars)
+  if (typeof targetPlural !== 'string') throw new Error('fail')
 
   const inputs = {
-    targetSingular, // required (fooBar)
-    targetPlural: String(argv.p || argv.plural || pluralize(targetSingular, 10)), // optional, fallbacks to english plural of --singular
+    targetSingular: targetSingular || pluralize(targetPlural, 1),
+    targetPlural: targetPlural || pluralize(targetSingular, 10),
 
     // other stuff you can override
     sourceDir: path.resolve(__dirname, argv.sourceDir || '../src'),
@@ -29,10 +33,11 @@ function main(argv: Record<string, any>) {
     filterRx: makeFilter(argv),
 
     force: argv.force === true, // true to overwrite existing files
+    verbose: (argv.v ?? argv.verbose) === true, // true to log everything
     dryRun: (argv.d ?? argv.dry ?? argv.dryRun) === true, // dont write anything
 
     hardMaxFiles: Number(argv.hardMaxFiles || 0) || 30, // safety measure. Abort if more than N source files are found
-    minNameLength: Number(argv.minNameLength || 0) || 5, // safety measure. Override if you really want a shorter name
+    minNameLength: Number(argv.minNameLength || 0) || 4, // safety measure. Override if you really want a shorter name
     maxNameLength: Number(argv.maxNameLength || 0) || 32, // safety measure. Override if you want a longer name
     maxNameDiff: Number(argv.maxNameDiff || 0) || 6, // safety measure. Override if you want a weird name
     maxScanDepth: Number(argv.maxScanDepth || 0) || 15, // safety measure. Override if you like deeply nested
@@ -48,7 +53,7 @@ function main(argv: Record<string, any>) {
     dstPluralNames: makeNames(inputs.targetPlural),
   }
 
-  console.log('main() inputs', { ...cfg, singularNames: '**', pluralNames: '**' })
+  cfg.verbose && console.log('main() inputs', { ...cfg, singularNames: '**', pluralNames: '**' })
 
   if (!cfg.targetSingular || !cfg.targetPlural) {
     console.error('Usage: pnpm make --singular=fooBar --plural=fooBars')
@@ -123,7 +128,7 @@ function main(argv: Record<string, any>) {
     return !!name
   }).map(x => x!)
 
-  console.log('wantedPaths', JSON.stringify(wantedPaths, null, 4))
+  cfg.verbose && console.log('wantedPaths', JSON.stringify(wantedPaths, null, 4))
 
   // verify hard limit to avoid mistakes
   if (wantedPaths.length > cfg.hardMaxFiles) {
@@ -185,7 +190,7 @@ function main(argv: Record<string, any>) {
 
   // require the --force flag to overwrite files
   if (existingFiles.length) {
-    console.warn(`WARN! Will overwrite ${existingFiles.length} files`, existingFiles.map(x => x.path))
+    (cfg.verbose || cfg.dryRun) && console.warn(`WARN! Will overwrite ${existingFiles.length} files`, existingFiles.map(x => x.path))
 
     if (!cfg.force) {
       console.error('\n\nExisting files detected. You must run with the --force flag for this to happend\n\n')
@@ -194,7 +199,7 @@ function main(argv: Record<string, any>) {
   }
 
   // create target files
-  console.log('writing files...', JSON.stringify(wantedTargetFiles.map(x => x.path).sort(), null, 4))
+  cfg.verbose && console.log('writing files...', JSON.stringify(wantedTargetFiles.map(x => x.path).sort(), null, 4))
   wantedTargetFiles.forEach(file => {
     if (!cfg.dryRun) {
       // write file to disk
@@ -209,7 +214,7 @@ function main(argv: Record<string, any>) {
   if (cfg.dryRun) {
     console.log('Dry run successful. Now remove the --dry-run flag')
   } else {
-    console.log('\n\nSUCCESS!\n\n')
+    console.log(`SUCCESS! ${cfg.targetPlural}\n`)
   }
 
   return 0
@@ -302,4 +307,27 @@ function makeFilter(argv:any) {
 
 const argv = yargs(hideBin(process.argv)).argv as Record<string, any>
 
-process.exit(main(argv) || 0)
+// make -p (without -s) can be used multiple times to do a batch job.
+// example: make -p fooBars -p fooBarItems
+if (Array.isArray(argv.p)) {
+  console.log('processing multiple plural names..', argv.p.sort())
+
+  if (argv.s || argv.singular) {
+    throw new Error('fail')
+  }
+
+  argv.p.forEach(plural => {
+    const result = main({
+      ...argv,
+      p: plural,
+      plural,
+    })
+
+    if (result !== 0) {
+      console.error(`\n\n  failed at '${plural} (${result})'\n\n`)
+      process.exit(1)
+    }
+  })
+} else {
+  process.exit(main(argv) || 0)
+}
