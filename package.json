@@ -10,8 +10,10 @@
   "author": "moander@outlook.com",
   "license": "ISC",
   "dependencies": {
+    "@types/pluralize": "^0.0.30",
     "glob": "^10.3.3",
     "lodash": "^4.17.21",
+    "pluralize": "^8.0.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

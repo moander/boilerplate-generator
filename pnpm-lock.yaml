@@ -5,12 +5,18 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@types/pluralize':
+    specifier: ^0.0.30
+    version: 0.0.30
   glob:
     specifier: ^10.3.3
     version: 10.3.3
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
+  pluralize:
+    specifier: ^8.0.0
+    version: 8.0.0
   yargs:
     specifier: ^17.7.2
     version: 17.7.2
@@ -120,6 +126,10 @@ packages:
   /@types/node@20.5.1:
     resolution: {integrity: sha512-4tT2UrL5LBqDwoed9wZ6N3umC4Yhz3W3FloMmiiG4JwmUJWpie0c7lcnUNd4gtMKuDEO4wRVS8B6Xa0uMRsMKg==}
     dev: true
+
+  /@types/pluralize@0.0.30:
+    resolution: {integrity: sha512-kVww6xZrW/db5BR9OqiT71J9huRdQ+z/r+LbDuT7/EK50mCmj5FoaIARnVv0rvjUS/YpDox0cDU9lpQT011VBA==}
+    dev: false
 
   /@types/yargs-parser@21.0.0:
     resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
@@ -312,6 +322,11 @@ packages:
     dependencies:
       lru-cache: 10.0.1
       minipass: 7.0.3
+    dev: false
+
+  /pluralize@8.0.0:
+    resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
+    engines: {node: '>=4'}
     dev: false
 
   /require-directory@2.1.1:

@@ -12,6 +12,11 @@ pnpm i && pnmp make --singular=fooBar --plural=fooBars
 pnpm i && pnpm make -s fooBar -p fooBars -f 'vue|ts'
 ```
 
+```sh
+# auto-pluralization
+pnpm i && pnpm make -s fooBar --dry-run
+```
+
 ## Maintain boilerplate
 
 The idea is that you run `pnpm make` again, and then you go through

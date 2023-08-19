@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url'
 
 import { glob } from 'glob'
 import lodash from 'lodash'
+import pluralize from 'pluralize'
 import { hideBin } from 'yargs/helpers'
 import yargs from 'yargs/yargs'
 
@@ -13,9 +14,12 @@ const { kebabCase, startCase, sortBy, uniqBy } = lodash
 
 function main(argv: Record<string, any>) {
   console.log('argv', argv)
+
+  const targetSingular = String(argv.s || argv.singular || '') // required (fooBar)
+
   const inputs = {
-    targetSingular: String(argv.s || argv.singular || ''), // required (fooBar)
-    targetPlural: String(argv.p || argv.plural || ''), // required (fooBars)
+    targetSingular, // required (fooBar)
+    targetPlural: String(argv.p || argv.plural || pluralize(targetSingular, 10)), // optional, fallbacks to english plural of --singular
 
     // other stuff you can override
     sourceDir: path.resolve(__dirname, argv.sourceDir || '../src'),
