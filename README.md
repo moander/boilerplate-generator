@@ -21,3 +21,17 @@ Then it makes a copy of each file using the plural and singular names you have t
 Remember to go through the git diff after overwriting the boiler.
 
 This will overwrite all your custom changes, and using git diff to solve this is by design.
+
+## Include it in a project
+
+```sh
+git clone https://github.com/moander/boilerplate-generator
+```
+
+Then remove `.git` to make it part if your repo.
+
+```sh
+rm -rf ./boilerplate-generator/.git
+
+git add ./boilerplate-generator
+```
