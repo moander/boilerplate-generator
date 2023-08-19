@@ -7,7 +7,7 @@
 pn i && pn make device devices
 ```
 
-## Maintail boilerplate
+## Maintain boilerplate
 
 The idea is that you run `pn make` again, and then you go through
 the git diff to revert whatever custom stuff you want to preserve.
