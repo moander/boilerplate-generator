@@ -1,21 +1,26 @@
 # boilerplate-generator
 
+See [index.js](./index.js) for full set of options. Look for `const cfg = `..
+
 ## Usage
 
 ```sh
 # usage: pnpm make -s fooBar -p fooBars
-pnpm i && pnmp make --singular=fooBar --plural=fooBars
+pnpm i && pnmp make --singular=fooBar --plural=fooBars --dry-run
 ```
 
-```sh
-# usage with filtering:
-pnpm i && pnpm make -s fooBar -p fooBars -f 'vue|ts'
-```
+### Basic filtering
 
 ```sh
-# auto-pluralization
-pnpm i && pnpm make -s fooBar --dry-run
+pnpm i && pnpm make -s fooBar -f 'vue|ts' --dry
 ```
+
+### Regular expressions
+
+```sh
+pnpm i && pnpm make -s fooBar -x 'vue|ts' --dry
+```
+
 
 ## Maintain boilerplate
 

@@ -10,7 +10,7 @@ import yargs from 'yargs/yargs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url)) // hack to get __dirname in ESm
 
-const { kebabCase, startCase, sortBy, uniqBy } = lodash
+const { kebabCase, startCase, sortBy, uniqBy, escapeRegExp } = lodash
 
 function main(argv: Record<string, any>) {
   console.log('argv', argv)
@@ -26,10 +26,10 @@ function main(argv: Record<string, any>) {
     sourceSingular: String(argv.sourceSingular || 'boilerExample'),
     sourcePlural: String(argv.sourcePlural || 'boilerExamples'),
 
-    filterRx: new RegExp(argv.f || argv.filter || '.'),
+    filterRx: makeFilter(argv),
 
     force: argv.force === true, // true to overwrite existing files
-    dryRun: !!(argv.dry || argv.dryRun), // dont write anything
+    dryRun: (argv.d ?? argv.dry ?? argv.dryRun) === true, // dont write anything
 
     hardMaxFiles: Number(argv.hardMaxFiles || 0) || 30, // safety measure. Abort if more than N source files are found
     minNameLength: Number(argv.minNameLength || 0) || 5, // safety measure. Override if you really want a shorter name
@@ -264,6 +264,40 @@ function makeNamesMap(srcName: string, dstName: string) {
     dst,
     paired,
   } as const
+}
+
+function makeFilter(argv:any) {
+  let rx
+
+  // string filter
+  if ('f' in argv || 'filter' in argv) {
+    const str = argv.f ?? argv.filter
+
+    if (!str || typeof str !== 'string') {
+      console.error('the -f and --filter operator requires a non-empty string value', { str, argv })
+      process.exit(1)
+    }
+
+    rx = new RegExp(escapeRegExp(str))
+  }
+
+  // regex filter
+  if ('x' in argv || 'regex' in argv || 'regexp' in argv) {
+    const str = argv.x ?? argv.regex ?? argv.regexp
+    if (!str || typeof str !== 'string') {
+      console.error('the -x and --regex operator requires a non-empty string value', { str, argv })
+      process.exit(1)
+    }
+
+    if (rx) {
+      console.error('both --filter and --regex cannot be used at the same time', { argv })
+      process.exit(1)
+    }
+
+    rx = new RegExp(str)
+  }
+
+  return rx || /./
 }
 
 const argv = yargs(hideBin(process.argv)).argv as Record<string, any>
