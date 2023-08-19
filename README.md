@@ -3,13 +3,13 @@
 ## Usage
 
 ```sh
-# usage: pn make -s fooBar -p fooBars
-pn i && pn make --singular=fooBar --plural=fooBars
+# usage: pnpm make -s fooBar -p fooBars
+pnpm i && pnmp make --singular=fooBar --plural=fooBars
 ```
 
 ## Maintain boilerplate
 
-The idea is that you run `pn make` again, and then you go through
+The idea is that you run `pnpm make` again, and then you go through
 the git diff to revert whatever custom stuff you want to preserve.
 
 ## How it works

@@ -11,11 +11,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url)) // hack to get __
 
 const { kebabCase, startCase, sortBy, uniqBy } = lodash
 
-console.log('argv')
 function main(argv: Record<string, any>) {
+  console.log('argv', argv)
   const inputs = {
-    targetSingular: String(argv.s || argv.singular), // required (fooBar)
-    targetPlural: String(argv.p || argv.plural), // required (fooBars)
+    targetSingular: String(argv.s || argv.singular || ''), // required (fooBar)
+    targetPlural: String(argv.p || argv.plural || ''), // required (fooBars)
 
     // other stuff you can override
     sourceDir: path.resolve(__dirname, argv.sourceDir || '../src'),
@@ -44,13 +44,13 @@ function main(argv: Record<string, any>) {
 
   console.log('main() inputs', { ...cfg, singularNames: '**', pluralNames: '**' })
 
-  validName(cfg.sourceSingular, cfg.sourcePlural, cfg.targetPlural, cfg.targetSingular)
-
   if (!cfg.targetSingular || !cfg.targetPlural) {
-    console.error('Usage: pn make --singular=fooBar --plural=fooBars')
-    console.error('Example:\n\n  pn i && pn make -s fooBar -p fooBars\n\n')
+    console.error('Usage: pnpm make --singular=fooBar --plural=fooBars')
+    console.error('Example:\n\n  pnpm i && pnpm make -s fooBar -p fooBars\n\n')
     return 1
   }
+
+  validName(cfg.sourceSingular, cfg.sourcePlural, cfg.targetPlural, cfg.targetSingular)
 
   if (cfg.targetSingular === cfg.targetPlural || cfg.sourcePlural === cfg.targetPlural) {
     console.error('plural and singular cannot be the same')
