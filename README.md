@@ -3,8 +3,8 @@
 ## Usage
 
 ```sh
-# usage: pn make <singular> <plural>
-pn i && pn make device devices
+# usage: pn make -s fooBar -p fooBars
+pn i && pn make --singular=fooBar --plural=fooBars
 ```
 
 ## Maintain boilerplate
@@ -14,7 +14,7 @@ the git diff to revert whatever custom stuff you want to preserve.
 
 ## How it works
 
-It will scan `../src` for folder and files containing `example-boiler` and all it's different casings.
+It will scan `../src` for folder and files containing `boiler-example` and all it's different casings.
 
 Then it makes a copy of each file using the plural and singular names you have the generator.
 
