@@ -7,6 +7,11 @@
 pnpm i && pnmp make --singular=fooBar --plural=fooBars
 ```
 
+```sh
+# usage with filtering:
+pnpm i && pnpm make -s fooBar -p fooBars -f 'vue|ts'
+```
+
 ## Maintain boilerplate
 
 The idea is that you run `pnpm make` again, and then you go through

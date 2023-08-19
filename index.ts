@@ -22,7 +22,9 @@ function main(argv: Record<string, any>) {
     sourceSingular: String(argv.sourceSingular || 'boilerExample'),
     sourcePlural: String(argv.sourcePlural || 'boilerExamples'),
 
-    force: !!(argv.force), // true to overwrite existing files
+    filterRx: new RegExp(argv.f || argv.filter || '.'),
+
+    force: argv.force === true, // true to overwrite existing files
     dryRun: !!(argv.dry || argv.dryRun), // dont write anything
 
     hardMaxFiles: Number(argv.hardMaxFiles || 0) || 30, // safety measure. Abort if more than N source files are found
@@ -92,6 +94,7 @@ function main(argv: Record<string, any>) {
   ], {
     maxDepth: cfg.maxScanDepth,
     cwd: __dirname,
+    nodir: true,
   })
 
   // filter out interesting source paths
@@ -109,7 +112,12 @@ function main(argv: Record<string, any>) {
       }
     }
     return undefined
-  }).filter(x => x).map(x => x!)
+  }).filter(name => {
+    if (name && cfg.filterRx) {
+      return cfg.filterRx.test(name.dstPath)
+    }
+    return !!name
+  }).map(x => x!)
 
   console.log('wantedPaths', JSON.stringify(wantedPaths, null, 4))
 
@@ -119,22 +127,14 @@ function main(argv: Record<string, any>) {
     return 1
   }
 
-  const wantedTargetDirs = [] as string[]
-
   const wantedTargetFiles = [] as {
     path: string;
     data: string;
   }[]
 
-  // iterate each source file and directory, and string replace it's content to prepare it for target write
+  // iterate each source file and string replace it's content to prepare it for target write
   wantedPaths.forEach(wp => {
     const srcStat = fs.statSync(wp.srcPath)
-
-    // folders we need to create
-    if (srcStat.isDirectory()) {
-      wantedTargetDirs.push(wp.dstPath)
-      return
-    }
 
     // files we need to create
     if (srcStat.isFile()) {
@@ -189,24 +189,13 @@ function main(argv: Record<string, any>) {
     }
   }
 
-  // create target directories
-  if (wantedTargetDirs.length) {
-    console.log('creating directories..', JSON.stringify(wantedTargetDirs.sort(), null, 4))
-
-    if (!cfg.dryRun) {
-      // create all wanted directories
-      wantedTargetDirs.sort().reverse().forEach(dir => {
-        fs.mkdirSync(dir, { recursive: true })
-      })
-    }
-  }
-
   // create target files
   console.log('writing files...', JSON.stringify(wantedTargetFiles.map(x => x.path).sort(), null, 4))
   wantedTargetFiles.forEach(file => {
     if (!cfg.dryRun) {
       // write file to disk
       console.log(`Writing ${file.data.length} characters to ${file.path}`)
+      fs.mkdirSync(path.dirname(path.resolve(__dirname, file.path)), { recursive: true })
       fs.writeFileSync(path.resolve(__dirname, file.path), file.data, 'utf-8')
     } else {
       console.log('DryRun skipped write', file.data.length, file.path)
@@ -275,4 +264,4 @@ function makeNamesMap(srcName: string, dstName: string) {
 
 const argv = yargs(hideBin(process.argv)).argv as Record<string, any>
 
-process.exit(main(argv) || 1)
+process.exit(main(argv) || 0)
