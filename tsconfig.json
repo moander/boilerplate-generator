@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node12/tsconfig.json",
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "module": "ES2022",
     "lib": [
@@ -9,7 +9,7 @@
   },
   "ts-node": {
     "esm": true,
-    "experimentalSpecifierResolution":"node"
+    "experimentalSpecifierResolution": "node"
   },
   "include": [
     "index.ts"
