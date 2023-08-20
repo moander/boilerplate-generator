@@ -1,6 +1,6 @@
 # boilerplate-generator
 
-See [index.js](./index.js) for full set of options. Look for `const cfg = `..
+See [index.ts](./index.ts) for full set of options. Look for `const cfg = `..
 
 ## Usage
 
